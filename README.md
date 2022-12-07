@@ -2,4 +2,4 @@
 
 #### First Run `settings.py`, press *Enter* for everything to get the default settings
 
-##### by default i will use the https://db-ip.com/db/ lite csvs since its free *i am not able to upload all the files to github directly since the limit is 25mb* you can download them and rename the files to **ipCity.csv** **ipCountry.csv** **ipAsn.csv**
+##### by default i will use the https://db-ip.com/db/ lite csvs since its free *i am not able to upload all the files to github directly since the limit is 25mb* you can download them and rename the files to **ipCity.csv** / **ipCountry.csv** / **ipAsn.csv** and copy them to the dbs directory.

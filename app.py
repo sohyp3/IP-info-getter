@@ -31,7 +31,7 @@ def checker():
         ipParted = ip.split('.')
 
         for db in dbs:
-            dataToInsert.append(checkIP(ipParted,db, ""))
+            dataToInsert.append(checkIP(ipParted,"dbs/"+db, ""))
         
         with open(data['outputfilename'],'a') as file:
             writer = csv.writer(file)
@@ -51,7 +51,7 @@ def checker():
                         ipParted = ip[0].split('.')
 
                         for db in dbs:
-                            dataToInsert.append(checkIP(ipParted,db, ""))
+                            dataToInsert.append(checkIP(ipParted,"dbs/"+db, ""))
                 
 def checkIP(ipParted,fileName,fileType):
     with open(fileName,'r') as csvFile:
