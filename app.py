@@ -1,7 +1,15 @@
 from configparser import ConfigParser
-import csv
+import csv, os,sys
 
 config = ConfigParser()
+
+
+file_path = "/path/to/file.txt"
+
+if not os.path.exists(file_path):
+    print("run `settings.py` first.\nExiting...")
+    sys.exit()
+
 config.read('cofig.ini')
 
 def checker():
