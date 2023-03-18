@@ -27,7 +27,7 @@ dbs = ''
 newdbAdddefaultdb = input('do you want to add the existed dbs Y/n: ')
 if newdbAdddefaultdb =='' or newdbAdddefaultdb.lower() == 'y' or newdbAdddefaultdb == 'yes':
 
-    dbs +='ipCountry.csv}ipCity.csv}ipAsn.csv'
+    dbs +='ipCountry.csv'
 
 print('for custom databases it sould be a csv file and it should be in this structure \n starting ip, ending ip, the data')
 newdbAdd = input('do you want to add custom dbs  y/N: ')
