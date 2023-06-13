@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 import csv, os ,sys
-from configs import mainConfig
+from settings import mainConfig
 
 
 config = ConfigParser()
