@@ -1,85 +1,99 @@
 from configparser import ConfigParser
-import csv, os,sys
+import csv, os ,sys
+from configs import mainConfig
+
 
 config = ConfigParser()
+config_path = './config.ini'
 
+if not os.path.exists(config_path):
+    mainConfig()
 
-file_path = "/path/to/file.txt"
+import csv
+from configparser import ConfigParser
 
-if not os.path.exists(file_path):
-    print("run `settings.py` first.\nExiting...")
-    sys.exit()
+def check_ip(ip_parted, file_name):
+    with open(file_name, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file)
+        for line in csv_reader:
+            first_ip = line[0].split(".")
+            second_ip = line[1].split(".")
 
-config.read('cofig.ini')
+            if int(ip_parted[0]) == int(first_ip[0]) and int(ip_parted[1]) >= int(first_ip[1]) and int(ip_parted[1]) <= int(second_ip[1]) \
+                and int(ip_parted[2]) >= int(first_ip[2]) and int(ip_parted[2]) <= int(second_ip[2]) \
+                and int(ip_parted[3]) >= int(first_ip[3]) and int(ip_parted[3]) <= int(second_ip[3]):
+                
+                data = ' '.join(line[2:])
+                print(data)
+                return data
 
 def checker():
-    data = config['SETTINGS']
-    dbs = list(data['dbs'].split("}"))
+    config = ConfigParser()
+    config.read('config.ini')
+    
+    settings = config['SETTINGS']
+    dbs = settings.get('dbs', '').split(',')
+    output_filename = settings.get('outputfilename' )
+    hide_warning = settings.get('hidewarning')
 
-    dataToInsert = []
+    if hide_warning == 'False' and os.path.exists(output_filename):
+        exit_choice = input(f"This program will overwrite the data in '{output_filename}' if it exists!\n Be careful and backup the data before continuing.\n Press Enter to continue or 'E' to exit or 'H' to exit and never show this again: ")
 
+        if exit_choice.lower() == 'h':
+            print('This will never appere again.\n')
+            config.set('SETTINGS', 'hidewarning', 'True')
 
-    exitChoice = input(f'This program will overwrite the data in `{data["outputfilename"]}` if exists!\nBe Careful and backup the data there\nPress Enter to continue, "E" to exit.  ')
-    if exitChoice.lower() == 'e':
-        quit()
-
+            with open('config.ini', 'w') as config_file:
+                config.write(config_file)
+            
+        if exit_choice.lower() == 'e':
+            quit()
+    # this is static for the time being, it will be changed soon.
     csv_fields = ['dstIP', 'dstCountry', 'dstCity', 'dstAsn']
 
-    with open(data["outputfilename"], 'w') as file:
+    with open(output_filename, 'w') as file:
         writer = csv.writer(file)
         writer.writerow(csv_fields)
 
-
-    choice = input('1 For search an ip.\n2 For checking from a csv file\n: ')
+    choice = input("1. Search for an IP.\n2. Check from a CSV file.\n: ")
 
     if choice == '1':
-        ip = input('enter the ip: ')
-        print('\n'+ip)
-        dataToInsert.append(ip)
-        ipParted = ip.split('.')
+        ip = input('Enter the IP: ')
+        print('\n' + ip)
+        data_to_insert = [ip]
+
+        ip_parted = ip.split('.')
 
         for db in dbs:
-            dataToInsert.append(checkIP(ipParted,"dbs/"+db, ""))
-        
-        with open(data['outputfilename'],'a') as file:
+            data_to_insert.append(check_ip(ip_parted, f"dbs/{db}"))
+
+        with open(output_filename, 'a') as file:
             writer = csv.writer(file)
-            writer.writerow(dataToInsert)
-            
+            writer.writerow(data_to_insert)
 
     elif choice == '2':
-        dbChoice = input(f"it will look in {data['inputfilename']}, do you want to choose another file y/N:  ")
+        db_choice = input(f"It will look in '{settings.get('inputfilename', 'importips.csv')}'. "
+                            "Do you want to choose another file? (y/N): ")
 
-        if dbChoice =='' or dbChoice.lower() == 'n' or dbChoice.lower()=='no':
-            with open(data['inputfilename'],'r') as file:
-                reader = csv.reader(file)
-                for ip in reader:
-                    if ip:
-                        print('\n'+ip[0])
-                        dataToInsert.append(ip[0])
-                        ipParted = ip[0].split('.')
+        if db_choice.lower() in ['y', 'yes']:
+            input_filename = input("Enter the input filename: ")
+        else:
+            input_filename = settings.get('inputfilename')
 
-                        for db in dbs:
-                            dataToInsert.append(checkIP(ipParted,"dbs/"+db, ""))
-                
-def checkIP(ipParted,fileName,fileType):
-    with open(fileName,'r') as csvFile:
-        csvReader = csv.reader(csvFile)
-        for line in csvReader:
-            firstIP = line[0].split(".")
-            seconIP = line[1].split(".")
+        with open(input_filename, 'r') as file:
+            reader = csv.reader(file)
+            for ip in reader:
+                if ip:
+                    print('\n' + ip[0])
+                    data_to_insert = [ip[0]]
+                    ip_parted = ip[0].split('.')
 
-            if int(ipParted[0]) == int(firstIP[0]):
-                
-                if int(ipParted[1]) >= int(firstIP[1]) and int(ipParted[1]) <= int(seconIP[1]):
-                    
-                    if int(ipParted[2]) >= int(firstIP[2]) and int(ipParted[2]) <= int(seconIP[2]):
+                    for db in dbs:
+                        data_to_insert.append(check_ip(ip_parted, f"dbs/{db}"))
 
-                        if int(ipParted[3]) >= int(firstIP[3]) and int(ipParted[3]) <= int(seconIP[3]):
-                            data = ''
-                            for i in range(2,len(line)):
-                                data +=line[i] +" "
-                            print(data)
-                            return(data)
+                    with open(output_filename, 'a') as file:
+                        writer = csv.writer(file)
+                        writer.writerow(data_to_insert)
 
 
 

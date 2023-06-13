@@ -1,74 +1,61 @@
 from configparser import ConfigParser
 
-config = ConfigParser()
-
-# asking for default output file name
-
-while True:
-    outFile = input('enter the new default output file name (press enter to leave it at default): ')
-    outFileSplit = outFile.split('.')
-    if outFile =='':
-        outFile = 'exported.csv'
-        break
-    elif len(outFileSplit) == 2 and outFileSplit[1] == 'csv':
-        break
-    elif len(outFileSplit) == 1 :
-        outFile = outFile+".csv"
-        break    
-    else:
-        print('it should be a csv file, try again!')
-
-
-# asking for databases to be included in the search, and weather add the default ones
-
-dbs = ''
-
-# the reason i am adding `}` between the database names is to convert the string to list later, i chose a charecter that probably will not be used in a name of a csv file. a file can include a spacebar. 
-newdbAdddefaultdb = input('do you want to add the existed dbs Y/n: ')
-if newdbAdddefaultdb =='' or newdbAdddefaultdb.lower() == 'y' or newdbAdddefaultdb == 'yes':
-
-    dbs +='ipCountry.csv'
-
-print('for custom databases it sould be a csv file and it should be in this structure \n starting ip, ending ip, the data')
-newdbAdd = input('do you want to add custom dbs  y/N: ')
-if newdbAdd =='' or newdbAdd.lower() == 'y' or newdbAdd == 'yes':
+def get_valid_filename(message, default_filename):
     while True:
-        newdb = input('enter the name of the new databses (type exit or 0 to exit)): ')
+        filename = input(message)
+        if not filename:
+            filename = default_filename
+        if filename.endswith('.csv'):
+            return filename
+        else:
+            print("\033[91mInvalid filename! It should end with '.csv'. Please try again.\033[0m")
 
-        newdbSplit = newdb.split('.')
+def add_custom_dbs(dbs):
+    print("\033[93mFor custom databases, the file structure should be: starting IP, ending IP, data\033[0m")
+    while True:
+        new_db = input("\033[96mEnter the name of the new database (type '\033[1mexit\033[0m\033[96m' or '\033[1m0\033[0m\033[96m' to exit): \033[0m")
+        if not new_db or new_db.lower() in ['exit', '0']:
+            break
+        if new_db.endswith('.csv'):
+            dbs.append(new_db)
+        else:
+            new_db += ".csv"
+            dbs.append(new_db)
+        print("\033[92mAlready chosen databases:\033[0m", ", ".join(dbs))
 
-        if newdb == '0' or newdb == 'exit' or newdb =='':
-            break 
-        elif len(newdbSplit) == 2 and newdbSplit[1] == 'csv':
-            dbs +="}"+newdb
-        elif len(newdbSplit) == 1 :
-            newdb= newdb+".csv"
-            dbs +="}"+newdb
+def mainConfig():
+    print("\033[95m==================== Welcome to Configuration Menu ====================\033[0m")
+    config = ConfigParser()
+    config_file = 'config.ini'
 
+    # Asking for the default output file name
+    default_out_file = 'exported.csv'
+    outFile = get_valid_filename("\033[96mEnter the new default output file name \033[30m(press Enter to leave it at default): \033[0m",default_out_file)
 
+    # Asking whether to add the default databases
+    add_default_dbs = input("\033[96mDo you want to add the existing databases? \033[30m(\033[1mY\033[0m/n): \033[0m").lower() in ['', 'y', 'yes']
+    dbs = []
+    if add_default_dbs:
+        dbs.append('ipCountry.csv')
 
-# asking for default output file name 
+    # Asking whether to add custom databases
+    add_custom = input("\033[96mDo you want to add custom databases? \033[30m(y/\033[1mN\033[0m): \033[0m").lower() in ['y', 'yes']
+    if add_custom:
+        add_custom_dbs(dbs)
 
-while True:
-    inputFile = input('enter the new default input file name (press enter to leave it at default): ')
-    inputFileSplit = inputFile.split('.')
-    if inputFile =='':
-        inputFile = 'importips.csv'
-        break
-    elif len(inputFileSplit) == 2 and inputFileSplit[1] == 'csv':
-        break
-    elif len(inputFileSplit) == 1 :
-        inputFile = inputFile+".csv"
-        break    
-    else:
-        print('it should be a csv file, try again!')
+    # Asking for the default input file name
+    default_in_file = 'imports.csv'
+    inputFile = get_valid_filename("\033[96mEnter the new default input file name \033[30m(press Enter to leave it at default): \033[0m",default_in_file)
 
-config['SETTINGS']={
-    'outPutFileName' : outFile,
-    'dbs' : dbs,
-    'inputFileName':inputFile,
+    config['SETTINGS'] = {
+        'outPutFileName': outFile,
+        'dbs': ','.join(dbs),
+        'inputFileName': inputFile,
+        'hideWarning' : False,
+    }
 
-}
+    with open(config_file, 'w') as conf:
+        config.write(conf)
 
-with open('cofig.ini','w') as conf:
-    config.write(conf)
+    print("\033[92mConfiguration saved successfully! \U0001F4BE\033[0m")
+
