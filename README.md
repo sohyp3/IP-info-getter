@@ -10,10 +10,8 @@ Python 3.x
 
 ## Usage
 1. Open a terminal window and navigate to the directory where you cloned the repository.
-2. Run the `settings.py` file by entering `python settings.py` in the terminal.
-3. Press Enter for each prompt to accept the default settings.
-4. Run the `app.py` file by entering `python app.py` in the terminal.
-5. Follow the prompts to search for an IP address or to check a list of IP addresses from a CSV file.
+2. Run the `app.py` file by entering `python app.py` in the terminal.
+3. Follow the prompts to search for an IP address or to check a list of IP addresses from a CSV file.
 
 #### Example
 ```  vbnet
